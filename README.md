@@ -19,7 +19,7 @@ This project serves as a practical assignment and demonstration of core game dev
 ## 🕹️ How to Play
 
 * **Movement Control:** Use the **W**, **A**, **S**, **D** keys.
-* **Jumping:** Press the **Spacebar**.
+* **Jumping:** Press the **Spacebar**. for cheat.
 
 ### 🎯 Collision Mechanics
 
@@ -49,11 +49,3 @@ The `respown_obj` function utilizes `Random.Range` within the maze's defined coo
 
 * **X Boundaries:** `[-38.0f, 2.0f]`
 * **Z Boundaries:** `[-21.0f, 28.0f]`
-
----
-
-## 🚀 Future Development / Next Steps
-
-* [ ] Implement **Game Over** state management (e.g., when points drop below zero).
-* [ ] Integrate a **User Interface (UI)** to provide clear feedback on the current score and Enemy count.
-* [ ] Refine the random respawn logic to **prevent new objects from spawning inside maze walls**.
