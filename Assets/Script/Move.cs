@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class Move : MonoBehaviour
 {
@@ -9,7 +10,7 @@ public class Move : MonoBehaviour
     public GameObject prefab;
     public GameObject currentPrefab;
     public GameObject enemy;
-    private GameObject currentEnemy;
+    private List<GameObject> currentEnemies = new List<GameObject>();
     public bool start_game = true;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -20,7 +21,7 @@ public class Move : MonoBehaviour
         if (start_game)
         {
             currentPrefab = respown_obj(prefab, -3, 2);
-            currentEnemy = respown_obj(enemy, -3, 0);
+            // currentEnemy = respown_obj(enemy, -3, 0);
             start_game = false;
         }
     }
@@ -33,13 +34,6 @@ public class Move : MonoBehaviour
 
  void FixedUpdate()
     {
-        //int x = 0;
-        //int y = 0;
-        //int z = 0;
-        //if (Input.GetKey("w")){
-        //    z++;
-        //}
-        
         float x = Input.GetAxis("Horizontal");
         float z = Input.GetAxis("Vertical");
         float y = 0;
@@ -61,6 +55,30 @@ public class Move : MonoBehaviour
         return Instantiate(obj, new Vector3(x,y,z), Quaternion.identity);
     }
 
+    void DestroyAllEnemies()
+    {
+        foreach (GameObject enemyInstance in currentEnemies)
+        {
+            if (enemyInstance != null)
+            {
+                Destroy(enemyInstance);
+            }
+        }
+        currentEnemies.Clear(); 
+    } 
+
+    void SpawnEnemiesByPoints()
+    {
+        int enemiesToSpawn = points; 
+        
+        for (int i = 0; i < enemiesToSpawn; i++)
+        {
+            GameObject newEnemy = respown_obj(enemy); 
+            currentEnemies.Add(newEnemy);
+        }
+    }
+
+
     void OnCollisionEnter(Collision collision)
     {
         if(collision.gameObject.tag == "Collectible"){
@@ -70,18 +88,15 @@ public class Move : MonoBehaviour
             currentPrefab = respown_obj(prefab);
             // Instantiate(prefab, new Vector3(Random.Range(-38.0f, 2.0f),0.5f,Random.Range(-21.0f, 28.0f)), Quaternion.identity);
 
-            if (currentEnemy != null)
-            {
-                Destroy(currentEnemy);
-                currentEnemy = respown_obj(enemy);
-            }
+            DestroyAllEnemies();
+            SpawnEnemiesByPoints();
         }
 
         if(collision.gameObject.tag == "Enemy"){
             Destroy(collision.gameObject);
             points--;
             Debug.Log(points);
-            currentEnemy = respown_obj(enemy);
+            // currentEnemy = respown_obj(enemy);
             if (currentPrefab != null)
             {
                 Destroy(currentPrefab);

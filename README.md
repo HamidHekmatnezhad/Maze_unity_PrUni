@@ -1,73 +1,59 @@
-# 🎮 3D Maze Runner Game (v0.1.0 - Core Mechanics)
+# 🎓 Academic Project: 3D Maze Runner Game (v0.2.0 - Dynamic Difficulty Scaling)
 
-This is a simple 3D Maze Runner project, developed using the **Unity** engine and **C#** scripting. This initial version focuses on implementing the core mechanics of player movement, collision handling for scoring items (Collectibles), and enemy interaction, featuring dynamic respawning.
+This project serves as a practical assignment and demonstration of core game development principles in **Unity** using **C#**. This version successfully implements dynamic difficulty scaling by linking the enemy count directly to the player's score.
 
-## ✨ Core Features (v0.1.0)
+**Course/Context:** [Insert Course Name or University/Semester here, e.g., Game Development Fundamentals, Fall 2025]
 
-* **Physics-Based Movement:** Player movement utilizes `Rigidbody` and `AddForce` for smooth, physics-driven control, including jumping with the **Spacebar**.
-* **Dynamic Respawn Logic:** Both the Collectible and the Enemy will instantly **despawn and respawn** at a new random location upon collision with the player, ensuring constant movement within the maze.
-* **Simple Scoring:** Points are tracked and logged to the console (`Debug.Log`).
+**Key Update from v0.1.0:** The game now supports **multiple enemies**, replacing the single enemy reference with a dynamic list (`List<GameObject> currentEnemies`) for scalable difficulty.
+
+---
+
+## ✨ Core Features (v0.2.0)
+
+* **Dynamic Difficulty Scaling:** The number of enemies present on the map is always equal to the player's current `points` value (N enemies = N points).
+* **Mass Respawn Mechanism:** Hitting a Collectible or an Enemy triggers the destruction and subsequent respawn of the entire current Enemy population.
+* **Physics-Based Movement:** Player movement using `Rigidbody` and jumping with the **Spacebar**.
 
 ---
 
 ## 🕹️ How to Play
 
-* **Movement Control:** Use the **W**, **A**, **S**, **D** keys or the arrow keys.
+* **Movement Control:** Use the **W**, **A**, **S**, **D** keys.
 * **Jumping:** Press the **Spacebar**.
 
 ### 🎯 Collision Mechanics
 
-The game uses a dynamic interaction system where one object's destruction triggers the relocation of the other.
-
 | Object Hit | Score Change | Collision Effect |
 | :--- | :--- | :--- |
-| **Collectible (Cube)** | **+1 Point** | The Collectible is destroyed, and the **current Enemy is destroyed**. A new Collectible and a new Enemy are immediately spawned at random locations. |
-| **Enemy** | **-1 Point** | The Enemy is destroyed, and the **current Collectible is destroyed**. A new Enemy and a new Collectible are immediately spawned at random locations. |
+| **Collectible (Cube)** | **+1 Point** | Destroys the Collectible. **Destroys ALL current Enemies.** Spawns a new Collectible. Spawns a new group of **N+1** Enemies. |
+| **Enemy** | **-1 Point** | Destroys the collided Enemy. **Destroys ALL current Enemies.** Spawns a new Collectible. Spawns a new group of **N-1** Enemies. |
 
 ---
 
-## 📁 Project Structure
+## ⚙️ Technical Implementation (`Move.cs`)
 
-The key components and files in this project:
+The core scaling and object management logic resides in the `Move` script.
 
-| Path | Description |
-| :--- | :--- |
-| **Assets/Script/Move.cs** | The main game script containing all logic for player movement, collision detection, scoring, and dynamic object respawning. |
-| **Assets/Prefab** | Contains the Prefabs for the collectible item (`Cube.prefab`) and the enemy (`enemy.prefab`). |
-| **Assets/Scenes** | Contains the main game scene (`SampleScene.unity`). |
+### Key Implementation Details
 
----
-
-## ⚙️ Technical Details (`Move.cs` Script)
-
-The core logic resides in the `Move` class, which is attached to the player object.
-
-### Key Variables
-
-| Variable | Type | Role |
+| Component | Status | Description |
 | :--- | :--- | :--- |
-| `speed` | `float` | Controls the force applied for movement (set to 2.0f). |
-| `points` | `int` | Stores the player's current score. |
-| `prefab` | `GameObject` | **Prefab reference** for the Collectible item. |
-| `enemy` | `GameObject` | **Prefab reference** for the Enemy. |
-| `currentPrefab` | `GameObject` | **Instance reference** to the currently spawned Collectible in the scene. |
-| `currentEnemy` | `GameObject` | **Instance reference** to the currently spawned Enemy in the scene. |
+| `currentEnemies` | `List<GameObject>` | Stores the instance references of all active enemies in the scene, enabling iteration and mass destruction. |
+| `DestroyAllEnemies()` | `void` | Utility function that safely destroys every instance within the `currentEnemies` list and clears the list for repopulation. |
+| `SpawnEnemiesByPoints()` | `void` | Utility function that iterates `points` times, calling `respown_obj` to instantiate a new Enemy for each point and saving the reference to the list. |
+| **Collision Logic** | Implemented | The `OnCollisionEnter` function now calls `DestroyAllEnemies()` followed by `SpawnEnemiesByPoints()` to enforce the difficulty scaling after every interaction. |
 
-### Respawn Logic (`respown_obj` function)
+### Respawn Boundaries
 
-The `respown_obj` function handles the creation of new instances at random positions within the defined maze boundaries:
+The `respown_obj` function utilizes `Random.Range` within the maze's defined coordinates:
 
 * **X Boundaries:** `[-38.0f, 2.0f]`
 * **Z Boundaries:** `[-21.0f, 28.0f]`
 
-### Initialization
+---
 
-The `Start()` function is used to instantiate the initial Collectible and Enemy instances, setting the game environment.
+## 🚀 Future Development / Next Steps
 
-```csharp
-if (start_game)
-{
-    currentPrefab = respown_obj(prefab, -3, 2);
-    currentEnemy = respown_obj(enemy, -3, 0);
-    start_game = false;
-}
+* [ ] Implement **Game Over** state management (e.g., when points drop below zero).
+* [ ] Integrate a **User Interface (UI)** to provide clear feedback on the current score and Enemy count.
+* [ ] Refine the random respawn logic to **prevent new objects from spawning inside maze walls**.
